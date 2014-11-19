@@ -83,6 +83,7 @@ class DataDownload
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
     @$calculate_grades_csv_btn = @$section.find("input[name='calculate-grades-csv']'")
     @$problem_grade_report_csv_btn = @$section.find("input[name='problem-grade-report']'")
+    @$async_report_btn = @$section.find("input[class='async-report-btn']'")
 
     # response areas
     @$download                        = @$section.find '.data-download-container'
@@ -236,23 +237,20 @@ class DataDownload
           @clear_display()
           @$download_display_text.html data['grading_config_summary']
 
-    @$calculate_grades_csv_btn.click (e) =>
-      @onClickGradeDownload @$calculate_grades_csv_btn, gettext("Error generating grades. Please try again.")
-
-    @$problem_grade_report_csv_btn.click (e) =>
-      @onClickGradeDownload @$problem_grade_report_csv_btn, gettext("Error generating problem grade report. Please try again.")
-
-  onClickGradeDownload: (button, errorMessage) ->
+  @$async_report_btn.click (e) =>
       # Clear any CSS styling from the request-response areas
       #$(".msg-confirm").css({"display":"none"})
       #$(".msg-error").css({"display":"none"})
       @clear_display()
-      url = button.data 'endpoint'
+      url = $(e.target).data 'endpoint'
       $.ajax
         dataType: 'json'
         url: url
-        error: (std_ajax_err) =>
-          @$reports_request_response_error.text errorMessage
+        error: std_ajax_err =>
+          if e.target.name == 'calculate-grades-csv'
+            @$grades_request_response_error.text gettext("Error generating grades. Please try again.")
+          else if e.target.name == 'ora2-response-btn'
+            @$grades_request_response_error.text gettext("Error getting ORA2 responses. Please try again.")
           $(".msg-error").css({"display":"block"})
         success: (data) =>
           @$reports_request_response.text data['status']

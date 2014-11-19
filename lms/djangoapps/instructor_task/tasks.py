@@ -44,7 +44,8 @@ from instructor_task.tasks_helper import (
     upload_exec_summary_report,
     upload_course_survey_report,
     generate_students_certificates,
-    upload_proctored_exam_results_report
+    upload_proctored_exam_results_report,
+    push_ora2_responses_to_s3,
 )
 
 
@@ -289,4 +290,14 @@ def cohort_students(entry_id, xmodule_instance_args):
     # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
     action_name = ugettext_noop('cohorted')
     task_fn = partial(cohort_students_and_upload, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.ORA2_RESPONSES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+def get_ora2_responses(entry_id, xmodule_instance_args):
+    """
+    Generate a CSV of ora2 responses and push it to S3.
+    """
+    action_name = ugettext_noop('generated')
+    task_fn = partial(push_ora2_responses_to_s3, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)

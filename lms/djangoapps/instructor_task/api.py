@@ -28,7 +28,8 @@ from instructor_task.tasks import (
     exec_summary_report_csv,
     course_survey_report_csv,
     generate_certificates,
-    proctored_exam_results_csv
+    proctored_exam_results_csv,
+    get_ora2_responses,
 )
 
 from certificates.models import CertificateGenerationHistory
@@ -51,6 +52,7 @@ def get_running_instructor_tasks(course_id):
     Used to generate a list of tasks to display on the instructor dashboard.
     """
     instructor_tasks = InstructorTask.objects.filter(course_id=course_id)
+
     # exclude states that are "ready" (i.e. not "running", e.g. failure, success, revoked):
     for state in READY_STATES:
         instructor_tasks = instructor_tasks.exclude(task_state=state)
@@ -420,6 +422,18 @@ def submit_cohort_students(request, course_key, file_name):
     task_class = cohort_students
     task_input = {'file_name': file_name}
     task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_ora2_request_task(request, course_key):
+    """
+    AlreadyRunningError is raised if an ora2 report is already being generated.
+    """
+    task_type = 'ora2_responses'
+    task_class = get_ora2_responses
+    task_input = {}
+    task_key = ''
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 

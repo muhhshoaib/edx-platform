@@ -244,6 +244,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('get_exec_summary_report', {}),
             ('get_proctored_exam_results', {}),
             ('get_problem_responses', {}),
+            ('get_ora2_responses', {}),
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
@@ -322,6 +323,11 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         # update_forum_role(self.course.id, staff_member, FORUM_ROLE_ADMINISTRATOR, 'allow')
 
         for endpoint, args in self.staff_level_endpoints:
+            expected_status = 200
+
+            if endpoint in ['calculate_grades_csv', 'get_ora2_responses']:
+                expected_status = 202
+
             # TODO: make these work
             if endpoint in ['update_forum_role_membership', 'list_forum_members']:
                 continue
@@ -333,7 +339,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             self._access_endpoint(
                 endpoint,
                 args,
-                200,
+                expected_status,
                 "Staff member should be allowed to access endpoint " + endpoint
             )
 
@@ -356,6 +362,11 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         self.client.login(username=inst.username, password='test')
 
         for endpoint, args in self.staff_level_endpoints:
+            expected_status = 200
+
+            if endpoint in ['calculate_grades_csv', 'get_ora2_responses']:
+                expected_status = 202
+
             # TODO: make these work
             if endpoint in ['update_forum_role_membership']:
                 continue
@@ -367,18 +378,23 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             self._access_endpoint(
                 endpoint,
                 args,
-                200,
+                expected_status,
                 "Instructor should be allowed to access endpoint " + endpoint
             )
 
         for endpoint, args in self.instructor_level_endpoints:
+            expected_status = 200
+
+            if endpoint in ['calculate_grades_csv', 'get_ora2_responses']:
+                expected_status = 202
+
             # TODO: make this work
             if endpoint in ['rescore_problem']:
                 continue
             self._access_endpoint(
                 endpoint,
                 args,
-                200,
+                expected_status,
                 "Instructor should be allowed to access endpoint " + endpoint
             )
 
@@ -2892,6 +2908,24 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                                  " You will be able to download the report" \
                                  " when it is" \
                                  " complete.".format(report_type=report_type)
+        self.assertIn(already_running_status, response.content)
+
+    def test_get_ora2_responses_success(self):
+        url = reverse('get_ora2_responses', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        with patch('instructor_task.api.submit_ora2_request_task') as mock_submit_ora2_task:
+            mock_submit_ora2_task.return_value = True
+            response = self.client.get(url, {})
+        success_status = "The ORA2 response report is being generated."
+        self.assertIn(success_status, response.content)
+
+    def test_get_ora2_responses_already_running(self):
+        url = reverse('get_ora2_responses', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        with patch('instructor_task.api.submit_ora2_request_task') as mock_submit_ora2_task:
+            mock_submit_ora2_task.side_effect = AlreadyRunningError()
+            response = self.client.get(url, {})
+        already_running_status = "An ORA2 response report generation task is already in progress."
         self.assertIn(already_running_status, response.content)
 
     def test_get_student_progress_url(self):

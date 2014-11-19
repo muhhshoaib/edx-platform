@@ -2327,6 +2327,32 @@ def list_financial_report_downloads(_request, course_id):
     return JsonResponse(response_payload)
 
 
+# Is the non_atomic_requests header correct?
+@transaction.non_atomic_requests
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_ora2_responses(request, course_id):
+    """
+    Pushes a Celery task which will aggregate ora2 responses for a course into a .csv
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        instructor_task.api.submit_ora2_request_task(request, course_key)
+        success_status = _("The ORA2 response report is being generated.")
+
+        return JsonResponse({"status": success_status}, status=202)
+    except AlreadyRunningError:
+        already_running_status = _(
+            "An ORA2 response report generation task is already in "
+            "progress. Check the 'Pending Instructor Tasks' table "
+            "for the status of the task. When completed, the report "
+            "will be available for download in the table below."
+        )
+
+        return JsonResponse({"status": already_running_status}, status=202)
+
+
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -2340,14 +2366,12 @@ def calculate_grades_csv(request, course_id):
         instructor_task.api.submit_calculate_grades_csv(request, course_key)
         success_status = _("The grade report is being created."
                            " To view the status of the report, see Pending Instructor Tasks below.")
-        return JsonResponse({"status": success_status})
+        return JsonResponse({"status": success_status}, status=202)
     except AlreadyRunningError:
         already_running_status = _("The grade report is currently being created."
                                    " To view the status of the report, see Pending Instructor Tasks below."
                                    " You will be able to download the report when it is complete.")
-        return JsonResponse({
-            "status": already_running_status
-        })
+        return JsonResponse({"status": already_running_status}, status=202)
 
 
 @transaction.non_atomic_requests
