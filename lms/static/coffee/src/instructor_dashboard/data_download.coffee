@@ -249,6 +249,8 @@ class DataDownload
         error: std_ajax_err =>
           if e.target.name == 'calculate-grades-csv'
             @$grades_request_response_error.text gettext("Error generating grades. Please try again.")
+          else if e.target.name == 'problem-grade-report'
+            @$grades_request_response_error.text gettext("Error generating problem grade report. Please try again.")
           else if e.target.name == 'ora2-response-btn'
             @$grades_request_response_error.text gettext("Error getting ORA2 responses. Please try again.")
           $(".msg-error").css({"display":"block"})

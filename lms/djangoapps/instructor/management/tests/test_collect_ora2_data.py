@@ -5,15 +5,20 @@ from mock import patch
 from django.core.management import call_command
 from django.core.management.base import CommandError
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-class CollectOra2DataTest(ModuleStoreTestCase):
+class CollectOra2DataTest(SharedModuleStoreTestCase):
     """ Test collect_ora2_data output and error conditions """
 
+    @classmethod
+    def setUpClass(cls):
+        super(CollectOra2DataTest, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
     def setUp(self):
-        self.course = CourseFactory.create()
+        super(CollectOra2DataTest, self).setUp()
 
         self.test_header = [
             "submission_uuid",

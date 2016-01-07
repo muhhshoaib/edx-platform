@@ -52,7 +52,6 @@ def get_running_instructor_tasks(course_id):
     Used to generate a list of tasks to display on the instructor dashboard.
     """
     instructor_tasks = InstructorTask.objects.filter(course_id=course_id)
-
     # exclude states that are "ready" (i.e. not "running", e.g. failure, success, revoked):
     for state in READY_STATES:
         instructor_tasks = instructor_tasks.exclude(task_state=state)

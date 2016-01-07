@@ -1603,7 +1603,9 @@ def invalidate_generated_certificates(course_id, enrolled_students, certificate_
     )
 
 
-def push_ora2_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+def push_ora2_responses_to_s3(
+        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name, config_name='ORA2_RESPONSES_DOWNLOAD'
+):
     """
     Collect ora2 responses and upload them to S3 as a CSV
     """
@@ -1650,7 +1652,7 @@ def push_ora2_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _tas
     curr_step = "Uploading CSV"
     update_task_progress()
 
-    report_store = ReportStore.from_config()
+    report_store = ReportStore.from_config(config_name)
     report_store.store_rows(
         course_id,
         u'{}_ORA2_responses_{}.csv'.format(course_id_string, timestamp_str),
