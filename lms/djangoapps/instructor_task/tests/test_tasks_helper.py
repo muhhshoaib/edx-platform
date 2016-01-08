@@ -1648,7 +1648,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         current_task.update_state = Mock()
         instructor_task = Mock()
         instructor_task.task_input = json.dumps({'students': None})
-        with self.assertNumQueries(214):  # Added by Christina to get tests passing again-- think about this.
+        with self.assertNumQueries(213):
             with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
                 mock_current_task.return_value = current_task
                 with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:

@@ -237,26 +237,26 @@ class DataDownload
           @clear_display()
           @$download_display_text.html data['grading_config_summary']
 
-  @$async_report_btn.click (e) =>
-      # Clear any CSS styling from the request-response areas
-      #$(".msg-confirm").css({"display":"none"})
-      #$(".msg-error").css({"display":"none"})
-      @clear_display()
-      url = $(e.target).data 'endpoint'
-      $.ajax
-        dataType: 'json'
-        url: url
-        error: std_ajax_err =>
-          if e.target.name == 'calculate-grades-csv'
-            @$grades_request_response_error.text gettext("Error generating grades. Please try again.")
-          else if e.target.name == 'problem-grade-report'
-            @$grades_request_response_error.text gettext("Error generating problem grade report. Please try again.")
-          else if e.target.name == 'ora2-response-btn'
-            @$grades_request_response_error.text gettext("Error getting ORA2 responses. Please try again.")
-          $(".msg-error").css({"display":"block"})
-        success: (data) =>
-          @$reports_request_response.text data['status']
-          $(".msg-confirm").css({"display":"block"})
+    @$async_report_btn.click (e) =>
+        # Clear any CSS styling from the request-response areas
+        #$(".msg-confirm").css({"display":"none"})
+        #$(".msg-error").css({"display":"none"})
+        @clear_display()
+        url = $(e.target).data 'endpoint'
+        $.ajax
+          dataType: 'json'
+          url: url
+          error: std_ajax_err =>
+            if e.target.name == 'calculate-grades-csv'
+              @$grades_request_response_error.text gettext("Error generating grades. Please try again.")
+            else if e.target.name == 'problem-grade-report'
+              @$grades_request_response_error.text gettext("Error generating problem grade report. Please try again.")
+            else if e.target.name == 'ora2-response-btn'
+              @$grades_request_response_error.text gettext("Error getting ORA2 responses. Please try again.")
+            $(".msg-error").css({"display":"block"})
+          success: (data) =>
+            @$reports_request_response.text data['status']
+            $(".msg-confirm").css({"display":"block"})
 
   # handler for when the section title is clicked.
   onClickTitle: ->
