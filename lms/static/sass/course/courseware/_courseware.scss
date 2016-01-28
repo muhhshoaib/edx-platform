@@ -106,8 +106,7 @@ html.video-fullscreen {
 
   .course-content,
   .courseware-results-wrapper {
-    @extend .content;
-    padding: ($baseline*2) 3%; // percent allows for smaller padding on mobile
+    padding: $baseline 3%; // percent allows for smaller padding on mobile
     line-height: 1.6;
 
     .xblock {
@@ -119,6 +118,7 @@ html.video-fullscreen {
     h1 {
       margin: 0 0 lh();
     }
+
     div.timed-exam {
       h3 {
         margin-bottom: 12px;

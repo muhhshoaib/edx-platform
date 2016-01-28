@@ -47,7 +47,6 @@ $link-color: rgb(26, 161, 222) !default;
 
   .left-shadow {
     @extend %ui-depth4;
-    @include linear-gradient(left, $shadow, $transparent);
     position: absolute;
     top: 0;
     left: 0;
@@ -59,7 +58,6 @@ $link-color: rgb(26, 161, 222) !default;
 
   .right-shadow {
     @extend %ui-depth4;
-    @include linear-gradient(right, $shadow, $transparent);
     position: absolute;
     top: 0;
     right: 0;
@@ -71,7 +69,6 @@ $link-color: rgb(26, 161, 222) !default;
 
   .sequence-list-wrapper {
     @extend %ui-depth2;
-    @include linear-gradient(top, #ddd, #eee);
     position: relative;
     border: 1px solid $gray-l3;
     height: 44px;
@@ -87,7 +84,6 @@ $link-color: rgb(26, 161, 222) !default;
     display: table;
     height: 100%;
     margin: 0;
-    padding: 0 ($baseline/2);
     width: 100%;
 
     a {
@@ -261,12 +257,10 @@ $link-color: rgb(26, 161, 222) !default;
   padding: 0;
 
   &.button-previous {
-    @include border-radius(35px, 0, 0, 35px);
     @include left(0);
   }
 
   &.button-next {
-    @include border-radius(0, 35px, 35px, 0);
     @include right(0);
   }
 
