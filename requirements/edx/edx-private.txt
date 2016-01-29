@@ -3,7 +3,6 @@
 # For Harvard courses:
 -e git+https://github.com/gsehub/xblock-mentoring.git@4d1cce78dc232d5da6ffd73817b5c490e87a6eee#egg=xblock-mentoring
 -e git+https://github.com/open-craft/problem-builder.git@90b2ecd8e948f34162e558b22f60e90287385f32#egg=xblock-problem-builder
-git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@3066fdbb5b002176226d15e2d1c3d33bc11939da#egg=xblock-drag-and-drop-v2
 
 # Oppia XBlock
 -e git+https://github.com/oppia/xblock.git@9f6b95b7eb7dbabb96b77198a3202604f96adf65#egg=oppia-xblock
