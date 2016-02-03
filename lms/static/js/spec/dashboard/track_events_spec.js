@@ -46,7 +46,7 @@
 
                 var xseriersActionButtonArgs = [$('.xseries-action .btn'),
                                                 'edx.bi.dashboard.xseries_cta_message.clicked',
-                                                window.edx.dashboard.generateProgramProperties]
+                                                window.edx.dashboard.generateProgramProperties];
 
                 var expectedArgsForTrackLinkCall = [courseTitleLinkArgs,
                                                     courseImageLinkArgs,
@@ -58,7 +58,7 @@
 
                 for (var index=0; index< expectedArgsForTrackLinkCall.length; index ++){
                     expect(window.analytics.trackLink.argsForCall[index]).toEqual(expectedArgsForTrackLinkCall[index]);
-                };
+                }
             });
 
             it('sends an analytics event when xseries messages are present in the DOM on page load', function() {
