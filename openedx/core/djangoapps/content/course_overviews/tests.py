@@ -17,6 +17,7 @@ from PIL import Image
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.courses import course_image_url
+from static_replace.models import AssetBaseUrlConfig
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
@@ -685,10 +686,11 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         *itertools.product(
             [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split],
             [True, False],
+            [True, False],
         )
     )
     @ddt.unpack
-    def test_happy_path(self, modulestore_type, create_after_overview):
+    def test_happy_path(self, modulestore_type, create_after_overview, use_cdn):
         """
         What happens when everything works like we expect it to.
 
@@ -733,10 +735,16 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
                 course_overview = CourseOverview.get_from_id(course.id)
 
             self.assertTrue(hasattr(course_overview, 'image_set'))
+
+            # Make sure we respect the CDN...
+            AssetBaseUrlConfig.objects.all().delete()
+            AssetBaseUrlConfig.objects.create(enabled=use_cdn, base_url='fakecdn.edx')
+            base_url = AssetBaseUrlConfig.get_base_url()
             image_urls = course_overview.image_urls
-            config = CourseOverviewImageConfig.current()
+            self.assertTrue(all(url.startswith(base_url) for url in image_urls.values()))
 
             # Make sure the thumbnail names come out as expected...
+            config = CourseOverviewImageConfig.current()
             self.assertTrue(image_urls['raw'].endswith('big_course_image.jpeg'))
             self.assertTrue(image_urls['small'].endswith('big_course_image-jpeg-{}x{}.jpg'.format(*config.small)))
             self.assertTrue(image_urls['large'].endswith('big_course_image-jpeg-{}x{}.jpg'.format(*config.large)))

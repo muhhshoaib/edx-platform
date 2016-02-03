@@ -4,6 +4,7 @@ Declaration of CourseOverview model
 import json
 import logging
 
+from django.conf import settings
 from django.db import models, transaction
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
 from django.db.utils import IntegrityError
@@ -17,8 +18,10 @@ from opaque_keys.edx.keys import CourseKey
 from config_models.models import ConfigurationModel
 from lms.djangoapps import django_comment_client
 from openedx.core.djangoapps.models.course_details import CourseDetails
+from static_replace.models import AssetBaseUrlConfig
 from util.date_utils import strftime_localized
 from xmodule import course_metadata_utils
+from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import CourseDescriptor, DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
@@ -549,7 +552,15 @@ class CourseOverview(TimeStampedModel):
             urls['small'] = self.image_set.small_url or raw_image_url
             urls['large'] = self.image_set.large_url or raw_image_url
 
-        return urls
+        # Serve from a CDN if available.
+        base_url = AssetBaseUrlConfig.get_base_url()
+        cdn_aware_urls = {
+            resolution: StaticContent.get_canonicalized_asset_path(self.id, url, base_url)
+            for resolution, url in urls.items()
+            if url != settings.DEFAULT_COURSE_ABOUT_IMAGE_URL
+        }
+
+        return cdn_aware_urls
 
     def __unicode__(self):
         """Represent ourselves with the course key."""
