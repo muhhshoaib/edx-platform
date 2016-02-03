@@ -17,35 +17,47 @@
             it('sends analytics events when the user interacts with dashboard', function() {
                 expect(window.analytics.trackLink.callCount).toBe(7);
 
-                var expectedArray = [
-                    [$('.course-title > a'),
-                    'edx.bi.dashboard.course_title.clicked',
-                    window.edx.dashboard.generateTrackProperties],
-                    [$('.cover'),
-                    'edx.bi.dashboard.course_image.clicked',
-                    window.edx.dashboard.generateTrackProperties],
-                    [$('.enter-course'),
-                    'edx.bi.dashboard.enter_course.clicked',
-                    window.edx.dashboard.generateTrackProperties],
-                    [$('.wrapper-action-more'),
-                    'edx.bi.dashboard.course_options_dropdown.clicked',
-                    window.edx.dashboard.generateTrackProperties],
-                    [$('.verified-info'),
-                    'edx.bi.dashboard.verified_info_link.clicked',
-                    window.edx.dashboard.generateTrackProperties],
-                    [$('.btn-find-courses'),
-                    'edx.bi.dashboard.find_courses_button.clicked',
-                    {
-                        category: 'dashboard',
-                        label: null
-                    }],
-                    [$('.xseries-action .btn'),
-                    'edx.bi.dashboard.xseries_cta_message.clicked',
-                    window.edx.dashboard.generateProgramProperties]
-                ];
+                var courseTitleLinkArgs = [$('.course-title > a'),
+                                           'edx.bi.dashboard.course_title.clicked',
+                                            window.edx.dashboard.generateTrackProperties];
 
-                for (var cnt=0; cnt< expectedArray.length; cnt ++){
-                    expect(window.analytics.trackLink.argsForCall[cnt]).toEqual(expectedArray[cnt]);
+                var courseImageLinkArgs = [$('.cover'),
+                                           'edx.bi.dashboard.course_image.clicked',
+                                           window.edx.dashboard.generateTrackProperties];
+
+                var enterCourseLinkArgs = [$('.enter-course'),
+                                           'edx.bi.dashboard.enter_course.clicked',
+                                           window.edx.dashboard.generateTrackProperties];
+
+                var courseOptionDropdownClickedArgs = [$('.wrapper-action-more'),
+                                                       'edx.bi.dashboard.course_options_dropdown.clicked',
+                                                       window.edx.dashboard.generateTrackProperties];
+
+                var verifiedInfoLinklArgs = [$('.verified-info'),
+                                             'edx.bi.dashboard.verified_info_link.clicked',
+                                             window.edx.dashboard.generateTrackProperties];
+
+                var findCourseButtonArgs = [$('.btn-find-courses'),
+                                            'edx.bi.dashboard.find_courses_button.clicked',
+                                            {
+                                                category: 'dashboard',
+                                                label: null
+                                            }];
+
+                var xseriersActionButtonArgs = [$('.xseries-action .btn'),
+                                                'edx.bi.dashboard.xseries_cta_message.clicked',
+                                                window.edx.dashboard.generateProgramProperties]
+
+                var expectedArgsForTrackLinkCall = [courseTitleLinkArgs,
+                                                    courseImageLinkArgs,
+                                                    enterCourseLinkArgs,
+                                                    courseOptionDropdownClickedArgs,
+                                                    verifiedInfoLinklArgs,
+                                                    findCourseButtonArgs,
+                                                    xseriersActionButtonArgs];
+
+                for (var index=0; index< expectedArgsForTrackLinkCall.length; index ++){
+                    expect(window.analytics.trackLink.argsForCall[index]).toEqual(expectedArgsForTrackLinkCall[index]);
                 };
             });
 
