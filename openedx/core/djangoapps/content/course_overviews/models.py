@@ -3,6 +3,7 @@ Declaration of CourseOverview model
 """
 import json
 import logging
+from urlparse import urlunparse
 
 from django.conf import settings
 from django.db import models, transaction
@@ -552,15 +553,29 @@ class CourseOverview(TimeStampedModel):
             urls['small'] = self.image_set.small_url or raw_image_url
             urls['large'] = self.image_set.large_url or raw_image_url
 
-        # Serve from a CDN if available.
-        base_url = AssetBaseUrlConfig.get_base_url()
-        cdn_aware_urls = {
-            resolution: StaticContent.get_canonicalized_asset_path(self.id, url, base_url)
-            for resolution, url in urls.items()
-            if url != settings.DEFAULT_COURSE_ABOUT_IMAGE_URL
-        }
+        return self._apply_cdn(urls)
 
-        return cdn_aware_urls
+    def _apply_cdn(self, image_urls):
+        """
+        Given a dict of resolutions -> urls, return a copy with CDN applied.
+
+        If CDN does not exist or disabled, just returns the original.
+        """
+        base_url = AssetBaseUrlConfig.get_base_url()
+        default_course_image_path = settings.STATIC_URL + settings.DEFAULT_COURSE_ABOUT_IMAGE_URL
+
+        def cdn_aware_url(url):
+            """Add CDN prefix if appropriate."""
+            if url == default_course_image_path:
+                # Special case the default image, which StaticContent doesn't
+                # understand (it might not even exist).
+                return urlunparse(
+                    (None, base_url, default_course_image_path, None, None, None)
+                )
+            # Rely on StaticContent for real course images in the contentstore
+            return StaticContent.get_canonicalized_asset_path(self.id, url, base_url)
+
+        return {resolution: cdn_aware_url(url) for resolution, url in image_urls.items()}
 
     def __unicode__(self):
         """Represent ourselves with the course key."""

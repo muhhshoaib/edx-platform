@@ -735,16 +735,10 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
                 course_overview = CourseOverview.get_from_id(course.id)
 
             self.assertTrue(hasattr(course_overview, 'image_set'))
-
-            # Make sure we respect the CDN...
-            AssetBaseUrlConfig.objects.all().delete()
-            AssetBaseUrlConfig.objects.create(enabled=use_cdn, base_url='fakecdn.edx')
-            base_url = AssetBaseUrlConfig.get_base_url()
-            image_urls = course_overview.image_urls
-            self.assertTrue(all(url.startswith(base_url) for url in image_urls.values()))
+            config = CourseOverviewImageConfig.current()
 
             # Make sure the thumbnail names come out as expected...
-            config = CourseOverviewImageConfig.current()
+            image_urls = course_overview.image_urls
             self.assertTrue(image_urls['raw'].endswith('big_course_image.jpeg'))
             self.assertTrue(image_urls['small'].endswith('big_course_image-jpeg-{}x{}.jpg'.format(*config.small)))
             self.assertTrue(image_urls['large'].endswith('big_course_image-jpeg-{}x{}.jpg'.format(*config.large)))
