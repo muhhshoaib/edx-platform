@@ -188,7 +188,7 @@ FEATURES = {
     'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
 
     # for load testing
-    'AUTOMATIC_AUTH_FOR_TESTING': False,
+    'AUTOMATIC_AUTH_FOR_TESTING': True,
 
     # Toggle the availability of the shopping cart page
     'ENABLE_SHOPPING_CART': False,

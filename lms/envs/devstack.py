@@ -32,6 +32,8 @@ LOG_OVERRIDES = [
 for log_name, log_level in LOG_OVERRIDES:
     logging.getLogger(log_name).setLevel(log_level)
 
+#################### EFISCHER IS DOING SOME HACKING ###########################
+FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
 ################################ EMAIL ########################################
 
