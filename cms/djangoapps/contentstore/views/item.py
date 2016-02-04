@@ -32,6 +32,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW, DEPRECATION_VSCOMPAT_EVENT
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 from xmodule.course_module import DEFAULT_START_DATE
 from django.contrib.auth.models import User
@@ -971,8 +972,15 @@ def _compute_visibility_state(xblock, child_info, is_unit_with_changes):
         # Note that a unit that has never been published will fall into this category,
         # as well as previously published units with draft content.
         return VisibilityState.needs_attention
+
+    module_store = modulestore()
+    course_key = xblock.location.course_key
+    course = module_store.get_course(course_key)
+    self_paced = SelfPacedConfiguration.current().enabled and course.self_paced
+
     is_unscheduled = xblock.start == DEFAULT_START_DATE
-    is_live = datetime.now(UTC) > xblock.start
+    # xblock is live if it's start date is in past OR if course is self paced
+    is_live = self_paced or datetime.now(UTC) > xblock.start
     children = child_info and child_info.get('children', [])
     if children and len(children) > 0:
         all_staff_only = True
