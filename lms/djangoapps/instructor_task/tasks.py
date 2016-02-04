@@ -293,7 +293,7 @@ def cohort_students(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.ORA2_RESPONSES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
 def get_ora2_responses(entry_id, xmodule_instance_args):
     """
     Generate a CSV of ora2 responses and push it to S3.

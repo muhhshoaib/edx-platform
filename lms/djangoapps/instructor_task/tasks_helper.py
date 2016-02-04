@@ -1604,7 +1604,7 @@ def invalidate_generated_certificates(course_id, enrolled_students, certificate_
 
 
 def push_ora2_responses_to_s3(
-        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name, config_name='ORA2_RESPONSES_DOWNLOAD'
+        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name, config_name='GRADES_DOWNLOAD'
 ):
     """
     Collect ora2 responses and upload them to S3 as a CSV
