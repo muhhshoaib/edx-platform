@@ -13,7 +13,6 @@ from itertools import chain
 from time import time
 import unicodecsv
 import logging
-import urllib
 
 from celery import Task, current_task
 from celery.states import SUCCESS, FAILURE
@@ -1604,7 +1603,7 @@ def invalidate_generated_certificates(course_id, enrolled_students, certificate_
 
 
 def push_ora2_responses_to_s3(
-        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name, config_name='GRADES_DOWNLOAD'
+        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name
 ):
     """
     Collect ora2 responses and upload them to S3 as a CSV
@@ -1646,18 +1645,10 @@ def push_ora2_responses_to_s3(
 
         return UPDATE_STATUS_FAILED
 
-    timestamp_str = start_time.strftime('%Y-%m-%d-%H%M')
-    course_id_string = urllib.quote(course_id.to_deprecated_string().replace('/', '_'))
-
     curr_step = "Uploading CSV"
     update_task_progress()
 
-    report_store = ReportStore.from_config(config_name)
-    report_store.store_rows(
-        course_id,
-        u'{}_ORA2_responses_{}.csv'.format(course_id_string, timestamp_str),
-        rows
-    )
+    upload_csv_to_report_store(rows, 'ORA2_responses', course_id, start_time)
 
     num_succeeded = 1
     curr_step = "Task completed successfully"

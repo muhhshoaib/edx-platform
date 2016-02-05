@@ -252,7 +252,7 @@ class DataDownload
             else if e.target.name == 'problem-grade-report'
               @$grades_request_response_error.text gettext("Error generating problem grade report. Please try again.")
             else if e.target.name == 'ora2-response-btn'
-              @$grades_request_response_error.text gettext("Error getting ORA2 responses. Please try again.")
+              @$grades_request_response_error.text gettext("Error generating ORA2 responses. Please try again.")
             $(".msg-error").css({"display":"block"})
           success: (data) =>
             @$reports_request_response.text data['status']
