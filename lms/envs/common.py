@@ -1811,6 +1811,7 @@ INSTALLED_APPS = (
     'provider',
     'provider.oauth2',
     'edx_oauth2_provider',
+    'oauth2_provider',  # from django-oauth-toolkit
 
     'third_party_auth',
 

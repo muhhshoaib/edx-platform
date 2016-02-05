@@ -818,7 +818,9 @@ if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
 if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
     urlpatterns += (
         url(r'^oauth2/', include('edx_oauth2_provider.urls', namespace='oauth2')),
+        url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     )
+
 
 
 if settings.FEATURES.get('ENABLE_LMS_MIGRATION'):
