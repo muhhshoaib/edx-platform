@@ -66,7 +66,6 @@ class XBlockDisableConfig(ConfigurationModel):
 
         return xblock_types
 
-    @classmethod
     def __unicode__(cls):
         config = cls.current()
         return u"Disabled xblocks = {disabled_xblocks}\nDeprecated xblocks = {disabled_create_block_types}".format(
