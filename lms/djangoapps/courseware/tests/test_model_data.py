@@ -137,8 +137,9 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # to discover if something other than the DjangoXBlockUserStateClient
         # has written to the StudentModule (such as UserStateCache setting the score
         # on the StudentModule).
-        with self.assertNumQueries(3):
-            self.kvs.set(user_state_key('a_field'), 'new_value')
+        with self.assertNumQueries(2, using='default'):
+            with self.assertNumQueries(2, using='student_module_history'):
+                self.kvs.set(user_state_key('a_field'), 'new_value')
         self.assertEquals(1, StudentModule.objects.all().count())
         self.assertEquals({'b_field': 'b_value', 'a_field': 'new_value'}, json.loads(StudentModule.objects.all()[0].state))
 
@@ -149,8 +150,9 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # to discover if something other than the DjangoXBlockUserStateClient
         # has written to the StudentModule (such as UserStateCache setting the score
         # on the StudentModule).
-        with self.assertNumQueries(3):
-            self.kvs.set(user_state_key('not_a_field'), 'new_value')
+        with self.assertNumQueries(2, using='default'):
+            with self.assertNumQueries(2, using='student_module_history'):
+                self.kvs.set(user_state_key('not_a_field'), 'new_value')
         self.assertEquals(1, StudentModule.objects.all().count())
         self.assertEquals({'b_field': 'b_value', 'a_field': 'a_value', 'not_a_field': 'new_value'}, json.loads(StudentModule.objects.all()[0].state))
 
@@ -161,8 +163,9 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # to discover if something other than the DjangoXBlockUserStateClient
         # has written to the StudentModule (such as UserStateCache setting the score
         # on the StudentModule).
-        with self.assertNumQueries(3):
-            self.kvs.delete(user_state_key('a_field'))
+        with self.assertNumQueries(2, using='default'):
+            with self.assertNumQueries(2, using='student_module_history'):
+                self.kvs.delete(user_state_key('a_field'))
         self.assertEquals(1, StudentModule.objects.all().count())
         self.assertRaises(KeyError, self.kvs.get, user_state_key('not_a_field'))
 
@@ -201,8 +204,9 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # We also need to read the database to discover if something other than the
         # DjangoXBlockUserStateClient has written to the StudentModule (such as
         # UserStateCache setting the score on the StudentModule).
-        with self.assertNumQueries(3):
-            self.kvs.set_many(kv_dict)
+        with self.assertNumQueries(2, using="default"):
+            with self.assertNumQueries(2, using="student_module_history"):
+                self.kvs.set_many(kv_dict)
 
         for key in kv_dict:
             self.assertEquals(self.kvs.get(key), kv_dict[key])
@@ -244,13 +248,14 @@ class TestMissingStudentModule(TestCase):
         self.assertEquals(0, len(self.field_data_cache))
         self.assertEquals(0, StudentModule.objects.all().count())
 
-        # We are updating a problem, so we write to courseware_studentmodulehistory
+        # We are updating a problem, so we write to courseware_studentmodulehistoryextended
         # as well as courseware_studentmodule. We also need to read the database
         # to discover if something other than the DjangoXBlockUserStateClient
         # has written to the StudentModule (such as UserStateCache setting the score
         # on the StudentModule).
-        with self.assertNumQueries(2, using='default'):
-            with self.assertNumQueries(1, using='student_module_history'):
+        # Django 1.8 also has a number of other BEGIN and SAVESTATE queries.
+        with self.assertNumQueries(4, using='default'):
+            with self.assertNumQueries(2, using='student_module_history'):
                 self.kvs.set(user_state_key('a_field'), 'a_value')
 
         self.assertEquals(1, sum(len(cache) for cache in self.field_data_cache.cache.values()))
